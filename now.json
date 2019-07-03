@@ -1,1 +1,6 @@
-{}
+{
+  "builds": [
+    { "src": "*.json", "use": "@now/static" },
+    { "src": "*.js", "use": "@now/node" }
+  ]
+}
