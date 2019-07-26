@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-module.exports = class db {
+module.exports.db = class db {
     constructor(filePath) {
         // Get db file
         let dbFile = fs.readFileSync(filePath).toString() // fs reads just a buffer, need toString() to translate it to string

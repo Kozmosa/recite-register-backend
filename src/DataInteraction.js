@@ -1,12 +1,12 @@
 const fs = require('fs')
 const path = require('path')
 
-module.exports = class db {
+const XyDB = require('./XyDB')
+
+module.exports.db = class db {
     constructor(filePath) {
-        // Get db file
-        let dbFile = fs.readFileSync(filePath).toString() // fs reads just a buffer, need toString() to translate it to string
-        this.filePath = filePath
-        this.content = JSON.parse(dbFile)
+        // Initialize XyDB with argument filePath
+        this.XyDB = XyDB.db()
     }
 
     exit() {
