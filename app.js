@@ -1,8 +1,10 @@
 const express = require('express')
 const db = require('./src/dblib')
+const BodyParser = require('body-parser')
 
 // init
-let database = new db.db('./data/database.json')
+let database = new db('./data/database.json')
+const Encryption = require('./src/Encryption')
 
 let app = express()
 var allowCrossDomain = function (req, res, next) {
@@ -14,6 +16,7 @@ var allowCrossDomain = function (req, res, next) {
 };
 
 app.use(allowCrossDomain);//运用跨域的中间件
+app.use(BodyParser.urlencoded({ extended: false }))
 
 app.get('/', (req, res) => {
     // Root Directory
@@ -48,8 +51,8 @@ app.get('/record/query', (req, res) => {
 
 app.get('/user/login', (req, res) => {
     // Login
-    const user_name = req.query.user_name
-    const user_password = req.query.user_password
+    const user_name = Encryption.DecryptBase64(req.query.user_name)
+    const user_password = Encryption.DecryptBase64(req.query.user_password)
     let user_flag = database.user_login(user_name, user_password)
     let response = {
         'code': 200,
@@ -57,6 +60,29 @@ app.get('/user/login', (req, res) => {
         'user_flag': user_flag
     }
     res.jsonp(response)
+})
+
+app.post('/user/login', (req, res) => {
+    // Encryption User Login Interface
+    const username = req.body.username
+    const password = req.body.password
+    /**
+     * Attention: !! Important !!
+     * This 'password' is MD5 encrypted password
+     * The real password in that database is encrypted, too
+     * So be careful, THIS IS NOT REAL CLEAR PASSWORD!!!
+     */
+    res.jsonp({
+        code: 200,
+        msg: 'success',
+        loginCorrect: database.user_login(username, password)
+        /**
+         * Here using database.user_login() method on database object to 
+         * connect database.
+         * Have to be aware is, the database object is required from the file names 'dblib.js', 
+         * and the dblib.js is a connector to interact with json file in data directory names 'database.json'
+         */
+    })
 })
 
 app.listen(8080, () => {
